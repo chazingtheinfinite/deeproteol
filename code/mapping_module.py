@@ -1,5 +1,6 @@
+import math
 
-# Mapping: https://www.mathworks.com/help/bioinfo/ref/aa2nt.html
+# Amino Acid Codon Mapping: https://www.mathworks.com/help/bioinfo/ref/aa2nt.html
 AA2DNA = {
         'A': ['GCT', 'GCC', 'GCA', 'GCG'], # Alanine
         'R': ['CGT', 'CGC', 'CGA', 'CGG', 'AGA', 'AGG'], # Arginine
@@ -44,3 +45,36 @@ colour_map = {
             'mmusculus': '#BB4768',
             'celegans': '#333333'
             }
+
+# Series of variables and functions for plotting Amino Acids
+def create_icosagon_dict(radius):
+    """ create_icosagon_dict
+        Generates a dictionary with coordinates
+        for each amino acid position.
+        Input : radius, assumed to be the central pixel of the image
+        Output: icosagon_dict, a mapping of amino acid to pixel coordinates (as 2-tuple)
+    """
+    icosagon_dict = {}
+    # Counterclockwise ordering of amino acids, sstarting at degree 0 (Eastwards)
+    aa_order = ['A', 'P', 'V', 'L', 'I', 'M', 'F', 'W', 'D', 'E', 'S', 'T', 'C', 'N', 'Q', 'Y', 'K', 'H', 'R', 'G']
+    degree = 0
+    for aa in aa_order:
+        # Must ensure to add radius to each to translate the origin
+        x_pixel = int(radius * math.cos(degree)) + radius
+        y_pixel = int(radius * math.sin(degree)) + radius
+        icosagon_dict[aa] = (x_pixel, y_pixel)
+        degree += 18
+    return icosagon_dict
+
+
+
+def create_icosagon(radius):
+    icodict = {'M' : (radius, 0), # North Cardinal
+               'F' : (radius - math.cos(108), ),
+            
+            }
+    # Quadrant 1:
+    
+
+
+
