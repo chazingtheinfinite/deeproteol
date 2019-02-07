@@ -1,0 +1,136 @@
+<html>
+<head>
+<title> Test Viz </title>
+<script src="http://d3js.org/d3.v3.js"></script>
+</head>
+<body>
+
+<!-- First Slider Element for changing the Number of Nodes -->
+<input id="nodeSlider" type="range" min="2" max="30" step="1" oninput="nodeChange(this.value)">
+<output id="nodeOutput"></output>
+<br><br>
+
+<!-- Second Slider Element for changing the Angle Theta -->
+<input id="thetaSlider" type="range" min="0" max="360" step="10" oninput="thetaChange(this.value)">
+<output id="thetaOutput"></output>
+<br><br>
+
+<!-- Third Slider Element for changing the Radius -->
+<input id="radiusSlider" type="range" min="10" max="50" step="5" oninput="radiusChange(this.value)">
+<output id="radiusOutput"></output>
+<br><br>
+
+<br><br>
+<script>
+
+// Default Values:
+var globalNodes  = 4; // TODO: 
+var globalTheta  = 0;
+var globalRadius = 30;
+
+function nodeChange(val) {
+  // Update Global Var
+  globalNodes = val;
+  d3.select("svg").remove();
+  document.getElementById('nodeOutput').innerHTML = val;
+  updatePoly(rotateCoords(50, 50, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, 50, 50)));
+}
+document.getElementById('nodeSlider').value = globalNodes;
+
+function thetaChange(val) {
+  // Update Global Var
+  globalTheta = val;
+  d3.select("svg").remove();
+  document.getElementById('thetaOutput').innerHTML = val;
+  updatePoly(rotateCoords(50, 50, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, 50, 50)));
+}
+document.getElementById('thetaSlider').value = globalTheta;
+
+function radiusChange(val) {
+  // Update Global Var
+  globalRadius = val;
+  d3.select("svg").remove();
+  document.getElementById('radiusOutput').innerHTML = val;
+  updatePoly(rotateCoords(50, 50, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, 50, 50)));
+}
+document.getElementById('thetaSlider').value = globalTheta;
+
+function getPoints(numNodes, radius, theta, xCenter, yCenter) {
+  var coords  = [];
+
+  // Initialize array of indecies to leverage array comprehension.
+  var idx = [...Array(numNodes).keys()];
+  var coords = []
+  for (i = 1; i < numNodes + 1; i++) {
+    var xVal = radius *  Math.cos(2 * Math.PI * (i / numNodes) + theta) + xCenter;
+    var yVal = radius *  Math.sin(2 * Math.PI * (i / numNodes) + theta) + yCenter;
+    coords.push({"x":xVal, "y":yVal});
+  }
+  
+  // Attempt with fancy comprehnsions
+  //var xCoords = [for (i of idx) radius * Math.cos(2 * Math.PI * (i / numNodes) + theta) + xCenter];
+  //var yCoords = [for (i of idx) radius * Math.sin(2 * Math.PI * (i / numNodes) + theta) + yCenter];
+  //return xCoords.map(function(xVal, i) {  return [xVal, yCoords[i]]; });
+  return coords;
+}
+
+function rotateCoords(xCenter, yCenter, theta, coords) {
+  var s = Math.sin(theta);
+  var c = Math.cos(theta);
+  
+  var newCoords = [];
+  // Update each point to rotated location
+  for (i = 0; i < globalNodes; i++){
+    // Translate back to origin
+    var xOrgn = coords[i].x - xCenter;
+    var yOrgn = coords[i].y - yCenter;
+
+    // Rotate about this point
+    var xNew = xOrgn * c - yOrgn * s;
+    var yNew = xOrgn * s + yOrgn * c;
+
+    // Untranslate the point
+    newCoords.push({"x":xNew + xCenter, "y":yNew + yCenter});
+  }
+  return newCoords;
+}
+
+function updatePoly(coords) {
+//console.log(getPoints(numPoints, 30, theta, 50, 50))
+console.log(coords)
+
+var vis = d3.select("body").append("svg")
+         .attr("width", 500)
+         .attr("height", 500),
+
+scaleX = d3.scale.linear()
+        .domain([0,100])
+        .range([0,500]),
+
+scaleY = d3.scale.linear()
+        .domain([0,100])
+        .range([0,500]),
+
+//poly = [{"x":0.0, "y":25.0},
+//        {"x":8.5,"y":23.4},
+//        {"x":13.0,"y":21.0},
+//        {"x":19.0,"y":15.5}];
+//poly = getPoints(numPoints, 30, theta, 50, 50);
+
+poly = coords;
+
+vis.selectAll("polygon")
+    .data([poly])
+  .enter().append("polygon")
+    .attr("points",function(d) { 
+        return d.map(function(d) { return [scaleX(d.x),scaleY(d.y)].join(","); }).join(" ");})
+    .attr("stroke","black")
+    .attr("stroke-width",2);
+}
+
+// Initialize the image with default number of points here.
+updatePoly(getPoints(globalNodes, globalRadius, globalTheta, 50, 50));
+</script>
+
+</body>
+</html>
