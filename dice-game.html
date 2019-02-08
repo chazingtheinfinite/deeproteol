@@ -1,26 +1,13 @@
 <html>
 <head>
-<title> Test Viz </title>
+<title> Dice Game </title>
 <script src="http://d3js.org/d3.v3.js"></script>
 </head>
 <body>
 
-<!-- First Slider Element for changing the Number of Nodes -->
-Number of Nodes
-<input id="nodeSlider" type="range" min="2" max="26" step="1" oninput="nodeChange(this.value)">
-<output id="nodeOutput"></output>
-<br><br>
-
-<!-- Second Slider Element for changing the Angle Theta -->
-Polygon Rotation
-<input id="thetaSlider" type="range" min="0" max="360" step="10" oninput="thetaChange(this.value)">
-<output id="thetaOutput"></output>
-<br><br>
-
-<!-- Third Slider Element for changing the Radius -->
-Polygon Radius
-<input id="radiusSlider" type="range" min="10" max="50" step="5" oninput="radiusChange(this.value)">
-<output id="radiusOutput"></output>
+<!-- Slider enables the selctive showcase of pointss -->
+<input id="pointSlider" type="range" min="0" max="1000" step="1" oninput="pointChange(this.value)">
+<output id="pointOutput"></output>
 <br><br>
 
 <br><br>
@@ -28,39 +15,25 @@ Polygon Radius
 
 // Default Values:
 var globalNodes    = 4; 
-var globalTheta    = 0;
-var globalRadius   = 30;
+var globalTheta    = 150;
+var globalRadius   = 50;
 var globalBgrnd    = true;//false;//true;
 var globalCenterX  = 55;
 var globalCenterY  = 55;
 var globalRandSeed = 42;
+var globalPoints   = 0;
 
-
-function nodeChange(val) {
+function pointChange(val) {
   // Update Global Var
-  globalNodes = val;
+  globalPoints = val;
   d3.select("svg").remove();
-  document.getElementById('nodeOutput').innerHTML = val;
+  document.getElementById('pointOutput').innerHTML = val;
+  //TODO THIS IS UNCHANGING NOW: PRobably Delete: 
   updatePoly(rotateCoords(globalCenterX, globalCenterY, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, globalCenterX, globalCenterY)));
+  //TODO:: IMPLEMENT: updatePoints() //Truncates the set of points at the globalPoints value
+  // Every time the random value changes, we recompute the new point positions and show those that appear by the globalPoints value...
 }
-document.getElementById('nodeSlider').value = globalNodes;
 
-function thetaChange(val) {
-  // Update Global Var
-  globalTheta = val;
-  d3.select("svg").remove();
-  document.getElementById('thetaOutput').innerHTML = val;
-  updatePoly(rotateCoords(globalCenterX, globalCenterY, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, globalCenterX, globalCenterY)));
-}
-document.getElementById('thetaSlider').value = globalTheta;
-
-function radiusChange(val) {
-  // Update Global Var
-  globalRadius = val;
-  d3.select("svg").remove();
-  document.getElementById('radiusOutput').innerHTML = val;
-  updatePoly(rotateCoords(globalCenterX, globalCenterY, globalTheta, getPoints(globalNodes, globalRadius,  globalTheta, globalCenterX, globalCenterY)));
-}
 document.getElementById('thetaSlider').value = globalTheta;
 
 function getPoints(numNodes, radius, theta, xCenter, yCenter) {
